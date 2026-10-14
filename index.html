@@ -1,4 +1,8 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RI:Place</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
@@ -11,12 +15,13 @@
   --ok:#1f9bb3; --ng:#d9534f;
   --font:"Hiragino Sans","Noto Sans JP",sans-serif;
   --slow:1.4s;
+  --nav-h:64px; --wrap:680px;   /* 画面幅に応じて下のメディアクエリで変わる */
   color-scheme:light;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;overflow-x:hidden}
 body{background:var(--bg);color:var(--fg);font-family:var(--font);line-height:1.8;overflow-x:hidden;
-  padding-block:110px 40vh;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));min-height:100vh}
+  padding-block:calc(var(--nav-h) + 46px) 40vh;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));min-height:100vh}
 button,input{font:inherit}
 :focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
 
@@ -26,16 +31,16 @@ button,input{font:inherit}
 @keyframes logoFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-26px) rotate(3deg)}}
 
 /* ナビ */
-.nav{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;height:64px;z-index:1000;display:flex;align-items:center;
+.nav{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;height:var(--nav-h);z-index:1000;display:flex;align-items:center;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   background:rgba(255,255,255,.85);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-.nav .logo-text{font-weight:900;font-size:22px;letter-spacing:.04em;max-width:720px;width:100%;margin:0 auto}
+.nav .logo-text{font-weight:900;font-size:22px;letter-spacing:.04em;max-width:var(--wrap);width:100%;margin:0 auto}
 /* ロゴの配色:I=水色、a=橙色、コロン=黒 */
 .lg-i{color:var(--cyan)}
 .lg-a{color:var(--orange)}
 .lg-c{color:#000}
 
-.wrap{max-width:680px;margin:0 auto}
+.wrap{max-width:var(--wrap);margin:0 auto}
 :where(.wrap) h1,:where(.wrap) h2{text-wrap:balance}
 
 /* ゆっくり現れる */
@@ -63,9 +68,9 @@ button,input{font:inherit}
 /* 説明(積み重なる) */
 .log{display:flex;flex-direction:column;gap:24px}
 .note{border-radius:30px;padding:34px 30px}
-.note h2{font-size:22px;font-weight:900;margin-bottom:12px;letter-spacing:.06em;color:var(--fg)}
+.note h2{font-size:clamp(19px,1vw + 16px,26px);font-weight:900;margin-bottom:12px;letter-spacing:.06em;color:var(--fg)}
 .note h2::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--cyan);margin-right:10px;vertical-align:middle}
-.note p{color:#40586a;white-space:pre-line}
+.note p{color:#40586a;white-space:pre-line;font-size:clamp(15px,.35vw + 14px,18px)}
 .note .done{display:block;margin-top:16px;font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.14em}
 
 /* 解答 */
@@ -106,9 +111,32 @@ input[type=text]:focus{border-color:var(--cyan);outline:none;box-shadow:0 0 0 3p
   form{padding:20px 18px;border-radius:32px}
   .btn{width:100%}
   .cover .btn{width:85%}
+  :root{--nav-h:56px}
+  .nav .logo-text{font-size:19px}
+  input[type=text]{flex-basis:100%}   /* 入力欄を1行使い、ボタンを下に回す */
+  .chips li{padding:5px 14px}
+}
+@media (max-width:360px){
+  .note{padding:22px 18px}
+  input[type=text]{letter-spacing:.08em;padding:12px 16px}
+}
+@media (min-width:900px){
+  :root{--wrap:760px;--nav-h:72px}
+  .nav .logo-text{font-size:26px}
+  .note{padding:40px 38px}
+  form{padding:26px 30px}
+  .small{padding:34px}
+}
+@media (min-width:1400px){
+  :root{--wrap:860px}
+}
+@media (max-height:480px) and (orientation:landscape){
+  .cover{padding-top:0;gap:14px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
 </style>
+</head>
+<body>
 
 <div class="background"></div>
 <div class="bg-logo" aria-hidden="true">R<span class="lg-i">I</span><span class="lg-c">:</span>Pl<span class="lg-a">a</span>ce</div>
@@ -325,5 +353,5 @@ $("smallForm").onsubmit = e => {
   }
 })();
 </script>
-
-</body></html>
+</body>
+</html>
