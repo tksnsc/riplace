@@ -1,8 +1,4 @@
-<!doctype html>
-<html lang="ja">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>RI:Place</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
@@ -70,6 +66,7 @@ button,input{font:inherit}
 .note{border-radius:30px;padding:34px 30px}
 .note h2{font-size:clamp(19px,1vw + 16px,26px);font-weight:900;margin-bottom:12px;letter-spacing:.06em;color:var(--fg)}
 .note h2::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--cyan);margin-right:10px;vertical-align:middle}
+.step-label{display:block;font-size:.58em;font-weight:700;letter-spacing:.14em;color:var(--cyan);line-height:1.6;margin-bottom:2px}
 .note p{color:#40586a;white-space:pre-line;font-size:clamp(15px,.35vw + 14px,18px)}
 .note .done{display:block;margin-top:16px;font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.14em}
 
@@ -135,8 +132,6 @@ input[type=text]:focus{border-color:var(--cyan);outline:none;box-shadow:0 0 0 3p
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
 </style>
-</head>
-<body>
 
 <div class="background"></div>
 <div class="bg-logo" aria-hidden="true">R<span class="lg-i">I</span><span class="lg-c">:</span>Pl<span class="lg-a">a</span>ce</div>
@@ -181,31 +176,39 @@ input[type=text]:focus{border-color:var(--cyan);outline:none;box-shadow:0 0 0 3p
 
 <script>
 /* ===== 設定:ここを書き換えれば内容を差し替えられます ===== */
+// 答えは平文ではなく、塩付きSHA-256のハッシュ値で持っています(ソースを見ても答えは読めません)
+const SALT = "ri-place:";
 const STEPS = [
   {
-    answer: "かいし",
-    title: "1st step",
+    hash: "62453d94e536893974ab1cfba2024cae6e6d4f4ce779ca06cc0edb1758159a3c",
+    label: "1st step", title: "Place -配置-",
     text: "指示に従ってまとめ謎の答えを送信してください。",
   },
   {
-    answer: "あんど",
-    title: "2nd step",
+    hash: "322f744c7cc7c4019126b6e93354bbacf7b2179aa608c69402591f6b391a3b7e",
+    label: "2nd step", title: "Re:Place -再配置-",
     text: "新たに3つの謎と3つのパネルが追加されました。\nすべての謎が成立するように再配置-Re:place-を行ってください。",
   },
   {
-    answer: "あっと",
-    title: "Last step",
+    hash: "625c53e45baa1239aadbc17de830a3c51ac3c4e9d5230c0c51841bdd8e1cb546",
+    label: "Last step", title: "Replace -置換-",
     text: "ここでは謎やパネルの追加は行われません。\n2ndで配置したパネルを置換-Replace-し、新たな6つの答えを導き出してください。\n置換のルール:「パネルのものを1つ次に置換する」",
   },
 ];
 const WAIT_AFTER_CORRECT = 1500;  // 「正解」を見せてから次が出るまで(ms)
-// 小謎の答え(ステップごと。現在のステップまでのものだけ判定される)
+// 小謎の答えのハッシュ(ステップごと。現在のステップまでのものだけ判定される)
 const SMALL_BY_STEP = [
-  ["かいとう","ぶし","かいめん"],                              // 1st step
-  ["もーど","あす","じっぷん","ふら","しんがた","とうろく"],  // 2nd step
-  ["ぬし","げつめん","らっと","おおいた","くろうと","こーん"], // Last step
+  ["b8a512dcdba6bac21fdd25f67bdc3557e3750f275429aedf7d204cf39875b177","ce9ac8842b3c61841463feff8bb0b63ef37483d364e2ebef6f11355ce278ef2b","c8ab9f54d1a55decb39481ef27aa0438049d17f255349ef5400e9442a1d5d90c"],
+  ["6e2f8ffa505a6007ec8b6b8bdf4142f3e21c7202d99528d601a1893dd1ea56e5","a12d08f7791ea6ba67712a80a56084ac38c25465f007c5ee3bf8b28299645d50","8411b55fe597c36040df8dbe5a55a056417e3a4c654a48d38a4e6763b166b217","fdd244e808dfab7128ec1cc89340d2849f32ba96b84e31a48ba72b7fa80a09b1","06052d36b2645926a922b0406e55ecdd1aa61681bcb849953558542872bdb3c3","267e82296daead8c670fec24ee97099aaf22c806e0daac4375ba130216377f7a"],
+  ["e1cd6f03ee43eb63610898da52dc31873a8b6b7a563f96f630e4ee1ab6d33f54","f365904d5727070c226e3f560f2d03654dea99e4dabcc05517a43e680b06cf1d","42056aeef3083cd7687bd9039e107764fd7d8920a7ca17d9dad5eb8b3c485b76","44d1c11d3528fa8cb1db75abf748809179e8c94bc1aa29be967afe1fba61b911","6e86eb76b21dd1079606e9af9344d4ce880117f2b9cd65157566d074f3742708","ee461c07b3c2f574bc44b93e8d8a79aafbdf5994d27ca510b20849e5aeefe16c"],
 ];
 /* ===== ここまで ===== */
+
+// 文字列 → 塩付きSHA-256(16進)
+async function sha(s){
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(SALT + s));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
+}
 
 const $ = id => document.getElementById(id);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -214,12 +217,13 @@ let busy = false;
 let started = false;
 let cleared = false;
 const found = new Set();
+const solved = [];   // 正解したステップの答え(表示用)
 const STORE_KEY = "ri-place-progress";
 
 // 進行状況をこのブラウザに保存(開けない環境では保存せずそのまま遊べる)
 function save(){
   try{
-    localStorage.setItem(STORE_KEY, JSON.stringify({started, current, cleared, found:[...found]}));
+    localStorage.setItem(STORE_KEY, JSON.stringify({started, current, cleared, found:[...found], solved}));
   }catch(e){}
 }
 
@@ -234,7 +238,9 @@ function addNote(i, animate = true){
   const s = STEPS[i];
   const note = document.createElement("article");
   note.className = "note glass" + (animate ? " fade-in" : "");
-  const h = document.createElement("h2"); h.textContent = s.title;
+  const h = document.createElement("h2");
+  const lb = document.createElement("span"); lb.className = "step-label"; lb.textContent = s.label;
+  h.append(lb, s.title);
   const p = document.createElement("p"); p.textContent = s.text;
   note.append(h,p);
   $("log").appendChild(note);
@@ -242,10 +248,10 @@ function addNote(i, animate = true){
 }
 
 // 解き終えたステップに答えを残す
-function addDone(note, i, animate = true){
+function addDone(note, text, animate = true){
   const m = document.createElement("span");
   m.className = "done" + (animate ? " fade-in" : "");
-  m.textContent = "✓ 正解:" + STEPS[i].answer;
+  m.textContent = "✓ 正解:" + text;
   note.appendChild(m);
 }
 
@@ -273,13 +279,14 @@ $("form").onsubmit = async e => {
   if(busy) return;
   const input = normalize($("answer").value);
   if(!input) return;
-  if(input !== STEPS[current].answer){ say("不正解","ng"); return; }
-
   busy = true;
+  if(await sha(input) !== STEPS[current].hash){ say("不正解","ng"); busy = false; return; }
+
   $("answer").value = "";
   $("answer").disabled = true; $("send").disabled = true;
   say("正解","ok");
-  addDone($("log").lastElementChild, current);
+  solved[current] = input;
+  addDone($("log").lastElementChild, input);
   if(current === STEPS.length - 1){ cleared = true; } else { current++; }
   save();                                    // 正解した時点で保存
   await sleep(WAIT_AFTER_CORRECT);
@@ -313,14 +320,14 @@ function renderChips(newest){
   });
 }
 // 現在のステップまでの小謎の答えだけを有効にする
-const activeSmall = () => new Set(SMALL_BY_STEP.slice(0, current + 1).flat().map(normalize));
-$("smallForm").onsubmit = e => {
+const activeSmall = () => new Set(SMALL_BY_STEP.slice(0, current + 1).flat());
+$("smallForm").onsubmit = async e => {
   e.preventDefault();
   const w = normalize($("smallAnswer").value);
   if(!w) return;
   const r = $("smallResult");
   $("smallAnswer").value = "";
-  if(!activeSmall().has(w)){ r.textContent = "不正解"; r.className = "result ng"; void r.offsetWidth; r.classList.add("shake"); return; }
+  if(!activeSmall().has(await sha(w))){ r.textContent = "不正解"; r.className = "result ng"; void r.offsetWidth; r.classList.add("shake"); return; }
   if(found.has(w)){ r.textContent = "回答済みです"; r.className = "result ok"; return; }
   found.add(w);
   r.textContent = "正解"; r.className = "result ok";
@@ -329,22 +336,29 @@ $("smallForm").onsubmit = e => {
 };
 
 // 前回の続きから再開する
-(function restore(){
+(async function restore(){
   let s = null;
   try{ s = JSON.parse(localStorage.getItem(STORE_KEY)); }catch(e){}
   if(!s || !s.started) return;
-  started = true;
   current = Math.min(Math.max(parseInt(s.current, 10) || 0, 0), STEPS.length - 1);
   cleared = !!s.cleared;
-  const valid = new Set(SMALL_BY_STEP.flat().map(normalize));
-  (Array.isArray(s.found) ? s.found : []).forEach(w => { if(valid.has(w)) found.add(w); });
+  // 保存された答えが本当に正しいものかをハッシュで確かめてから復元する
+  const valid = new Set(SMALL_BY_STEP.flat());
+  for(const w of (Array.isArray(s.found) ? s.found : [])){
+    if(typeof w === "string" && valid.has(await sha(w))) found.add(w);
+  }
+  const saved = Array.isArray(s.solved) ? s.solved : [];
+  for(let i = 0; i < STEPS.length; i++){
+    if(typeof saved[i] === "string" && await sha(saved[i]) === STEPS[i].hash) solved[i] = saved[i];
+  }
+  started = true;
 
   $("cover").hidden = true;
   $("game").hidden = false;
   $("small").hidden = false;
   for(let i = 0; i <= current; i++){
     const note = addNote(i, false);
-    if(i < current || cleared) addDone(note, i, false);
+    if((i < current || cleared) && solved[i]) addDone(note, solved[i], false);
   }
   renderChips();
   if(cleared){
@@ -353,5 +367,5 @@ $("smallForm").onsubmit = e => {
   }
 })();
 </script>
-</body>
-</html>
+
+</body></html>
