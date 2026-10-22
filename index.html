@@ -1,263 +1,381 @@
-```html
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>まとめ謎</title>
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RI:Place</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
 <style>
-  * {
-    box-sizing: border-box;
-  }
+/* Layout: RI:Works公式サイトに合わせた、淡いブルーの地にガラス調カードを重ねる縦長ページ。シアンとオレンジの二色 */
+:root{
+  --bg:#f7fbfd; --fg:#18354a; --sub:#5f7485; --soft:#8094a3;
+  --cyan:#2daec6; --cyan-light:#77e4ff; --orange:#eba12b; --orange-light:#ffc86e;
+  --glass:rgba(255,255,255,.62); --glass-line:rgba(255,255,255,.7); --chip:#edf4f7;
+  --ok:#1f9bb3; --ng:#d9534f;
+  --font:"Hiragino Sans","Noto Sans JP",sans-serif;
+  --slow:1.4s;
+  --nav-h:64px; --wrap:680px;   /* 画面幅に応じて下のメディアクエリで変わる */
+  color-scheme:light;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+[hidden]{display:none!important}   /* display指定のある要素でも hidden で確実に消す */
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);line-height:1.8;overflow-x:hidden;
+  padding-block:calc(var(--nav-h) + 46px) 40vh;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));min-height:100vh}
+button,input{font:inherit}
+:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
 
-  body {
-    margin: 0;
-    min-height: 100vh;
-    background: #f7f7f4;
-    color: #292929;
-    font-family: "Noto Sans JP", "Yu Gothic", sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 24px 16px;
-  }
+/* 背景 */
+.background{position:fixed;inset:0;z-index:-10;background:radial-gradient(circle at 50% 35%,#fff 0%,var(--bg) 62%)}
+.bg-logo{position:fixed;z-index:-9;top:-4vw;right:-6vw;font-size:clamp(120px,26vw,340px);font-weight:900;letter-spacing:.02em;line-height:1;color:var(--fg);opacity:.09;white-space:nowrap;pointer-events:none;user-select:none;animation:logoFloat 14s ease-in-out infinite}
+@keyframes logoFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-26px) rotate(3deg)}}
 
-  .container {
-    width: 100%;
-    max-width: 560px;
-    text-align: center;
-  }
+/* ナビ */
+.nav{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;height:var(--nav-h);z-index:1000;display:flex;align-items:center;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  background:rgba(255,255,255,.85);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.nav .logo-text{font-weight:900;font-size:22px;letter-spacing:.04em;max-width:var(--wrap);width:100%;margin:0 auto}
+/* ロゴの配色:I=水色、a=橙色、コロン=黒 */
+.lg-i{color:var(--cyan)}
+.lg-a{color:var(--orange)}
+.lg-c{color:#000}
 
-  .step-label {
-    font-size: 12px;
-    letter-spacing: 3px;
-    color: #777;
-    margin-bottom: 18px;
-  }
+.wrap{max-width:var(--wrap);margin:0 auto}
+:where(.wrap) h1,:where(.wrap) h2{text-wrap:balance}
 
-  h1 {
-    font-size: 28px;
-    font-weight: 500;
-    letter-spacing: 3px;
-    margin: 0 0 36px;
-  }
+/* ゆっくり現れる */
+.fade-in{animation:fadeUp var(--slow) ease both}
+.fade-out{animation:fadeOut 1s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}
+@keyframes fadeOut{to{opacity:0}}
 
-  .description {
-    min-height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 28px 24px;
-    border-top: 1px solid #c9c9c3;
-    border-bottom: 1px solid #c9c9c3;
-    font-size: 16px;
-    line-height: 2.2;
-    white-space: pre-line;
-    text-align: left;
-  }
+/* 表紙 */
+.cover{text-align:center;padding:8vh 0 0;display:flex;flex-direction:column;align-items:center;gap:22px}
+.cover h1{font-size:clamp(44px,12vw,72px);font-weight:900;line-height:1.1;letter-spacing:.02em}
+.cover .sub{color:var(--sub);font-size:18px;letter-spacing:.12em}
 
-  .form {
-    display: flex;
-    gap: 10px;
-    margin-top: 28px;
-  }
+/* ボタン */
+.btn{border:0;border-radius:22px;padding:17px 34px;font-size:14px;font-weight:700;letter-spacing:.12em;color:#fff;cursor:pointer;
+  transition:transform .3s ease,box-shadow .3s ease}
+.btn:hover:not(:disabled){transform:translateY(-5px) scale(1.03)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn-main{background:linear-gradient(135deg,var(--orange),var(--orange-light));box-shadow:0 10px 28px rgba(255,181,66,.28)}
+.btn-sub{background:linear-gradient(135deg,#47c9df,var(--cyan-light));box-shadow:0 10px 28px rgba(71,201,223,.28)}
 
-  input {
-    flex: 1;
-    min-width: 0;
-    padding: 15px;
-    border: 1px solid #c9c9c3;
-    border-radius: 0;
-    background: #fff;
-    font-size: 16px;
-    outline: none;
-  }
+/* ガラス調カード */
+.glass{background:var(--glass);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--glass-line);box-shadow:0 10px 40px rgba(0,0,0,.05)}
 
-  input:focus {
-    border-color: #456b59;
-  }
+/* 説明(積み重なる) */
+.log{display:flex;flex-direction:column;gap:24px}
+.note{border-radius:30px;padding:34px 30px}
+.note h2{font-size:clamp(19px,1vw + 16px,26px);font-weight:900;margin-bottom:12px;letter-spacing:.06em;color:var(--fg)}
+.note h2::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--cyan);margin-right:10px;vertical-align:middle}
+.step-label{display:block;font-size:.58em;font-weight:700;letter-spacing:.14em;color:var(--cyan);line-height:1.6;margin-bottom:2px}
+.note p{color:#40586a;white-space:pre-line;font-size:clamp(15px,.35vw + 14px,18px)}
+.note .done{display:block;margin-top:16px;font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.14em}
 
-  button {
-    padding: 15px 25px;
-    border: none;
-    background: #456b59;
-    color: #fff;
-    font-size: 14px;
-    letter-spacing: 1px;
-    cursor: pointer;
-  }
+/* 解答 */
+form{margin-top:32px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;border-radius:40px;padding:22px 24px}
+form label{flex-basis:100%;font-size:13px;font-weight:700;color:var(--sub);letter-spacing:.1em}
+input[type=text]{flex:1 1 200px;min-width:0;background:rgba(255,255,255,.85);color:var(--fg);border:1px solid #cfe3ea;border-radius:999px;padding:13px 22px;font-size:18px;letter-spacing:.2em}
+input[type=text]:focus{border-color:var(--cyan);outline:none;box-shadow:0 0 0 3px rgba(45,174,198,.25)}
+.result{min-height:2em;margin:16px 0 0;font-weight:700;letter-spacing:.2em;text-align:center}
+.result.ok{color:var(--ok)}
+.result.ng{color:var(--ng)}
+.result.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 
-  button:hover {
-    background: #355343;
-  }
+/* クリア */
+.clear{text-align:center;padding:48px 0 0;display:flex;flex-direction:column;align-items:center;gap:18px}
+.clear h2{font-size:clamp(44px,14vw,80px);font-weight:900;letter-spacing:.14em;margin-left:.14em;
+  background:linear-gradient(135deg,var(--cyan),var(--orange));-webkit-background-clip:text;background-clip:text;color:transparent}
+.clear p{color:var(--sub)}
+.share{display:inline-block;text-decoration:none;text-align:center;margin-top:8px}
+.ghost{background:var(--chip);border:0;border-radius:999px;color:var(--sub);padding:10px 26px;cursor:pointer;font-weight:700;transition:background .3s,color .3s}
+.ghost:hover{background:var(--cyan);color:#fff}
 
-  .message {
-    min-height: 32px;
-    margin-top: 20px;
-    font-size: 16px;
-    letter-spacing: 2px;
-  }
+/* 小謎の回答判定 */
+.small{margin-top:64px;border-radius:30px;padding:30px 28px}
+.small h2{font-size:18px;font-weight:900;letter-spacing:.08em;margin-bottom:4px}
+.small-note{font-size:13px;color:var(--sub);margin-bottom:16px}
+.small h2::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--orange);margin-right:10px;vertical-align:middle}
+.small-form{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.small-form label{flex-basis:100%;font-size:13px;font-weight:700;color:var(--sub);letter-spacing:.1em}
+.chips{list-style:none;display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.chips:empty{display:none}
+.chips li{background:var(--chip);color:var(--fg);border-radius:999px;padding:6px 18px;font-weight:700;letter-spacing:.12em;border:1px solid rgba(45,174,198,.35)}
+.chips li.new{animation:fadeUp var(--slow) ease both}
 
-  .message.correct {
-    color: #456b59;
-  }
-
-  .message.wrong {
-    color: #a14d43;
-  }
-
-  .hidden {
-    display: none !important;
-  }
-
-  .clear-title {
-    font-size: 34px;
-    letter-spacing: 5px;
-    color: #456b59;
-    margin-bottom: 24px;
-  }
-
-  .clear-text {
-    font-size: 16px;
-    line-height: 2;
-  }
-
-  @media (max-width: 420px) {
-    h1 {
-      font-size: 23px;
-    }
-
-    .description {
-      padding: 24px 16px;
-      font-size: 14px;
-    }
-
-    .form {
-      gap: 8px;
-    }
-
-    input {
-      padding: 13px 10px;
-    }
-
-    button {
-      padding: 13px 18px;
-    }
-  }
+@media (max-width:600px){
+  .small{padding:24px 18px;border-radius:26px}
+  .note{padding:26px 22px;border-radius:26px}
+  form{padding:20px 18px;border-radius:32px}
+  .btn{width:100%}
+  .cover .btn{width:85%}
+  :root{--nav-h:56px}
+  .nav .logo-text{font-size:19px}
+  input[type=text]{flex-basis:100%}   /* 入力欄を1行使い、ボタンを下に回す */
+  .chips li{padding:5px 14px}
+}
+@media (max-width:360px){
+  .note{padding:22px 18px}
+  input[type=text]{letter-spacing:.08em;padding:12px 16px}
+}
+@media (min-width:900px){
+  :root{--wrap:760px;--nav-h:72px}
+  .nav .logo-text{font-size:26px}
+  .note{padding:40px 38px}
+  form{padding:26px 30px}
+  .small{padding:34px}
+}
+@media (min-width:1400px){
+  :root{--wrap:860px}
+}
+@media (max-height:480px) and (orientation:landscape){
+  .cover{padding-top:0;gap:14px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
 </style>
 </head>
-
 <body>
-<main class="container">
 
-  <div id="game">
-    <div class="step-label" id="stepLabel">STEP 01</div>
-    <h1>まとめ謎</h1>
+<div class="background"></div>
+<div class="bg-logo" aria-hidden="true">R<span class="lg-i">I</span><span class="lg-c">:</span>Pl<span class="lg-a">a</span>ce</div>
+<header class="nav"><div class="logo-text">R<span class="lg-i">I</span><span class="lg-c">:</span>Pl<span class="lg-a">a</span>ce</div></header>
 
-    <div class="description" id="description"></div>
+<div class="wrap">
+  <!-- 表紙 -->
+  <section id="cover" class="cover fade-in">
+    <h1>R<span class="lg-i">I</span><span class="lg-c">:</span>Pl<span class="lg-a">a</span>ce</h1>
+    <p class="sub">持ち帰り謎</p>
+    <button class="btn btn-main" id="start" type="button">始める</button>
+  </section>
 
-    <form class="form" id="answerForm">
-      <input
-        type="text"
-        id="answer"
-        placeholder="答えを入力"
-        autocomplete="off"
-        required
-      >
-      <button type="submit">送信</button>
+  <!-- 本編 -->
+  <section id="game" hidden>
+    <div class="log" id="log"></div>
+    <form id="form" class="glass" autocomplete="off">
+      <label for="answer">答え</label>
+      <input type="text" id="answer" lang="ja" placeholder="ひらがなで入力" required>
+      <button class="btn btn-sub" type="submit" id="send">送信</button>
     </form>
+    <p class="result" id="result" role="status" aria-live="polite"></p>
+    <div class="clear" id="clear" hidden>
+      <h2>CLEAR</h2>
+      <p>あなたは「RI:Place」を解き明かした。</p>
+      <a class="btn btn-sub share" target="_blank" rel="noopener noreferrer" href="https://twitter.com/intent/tweet?text=%E6%8C%81%E3%81%A1%E5%B8%B0%E3%82%8A%E8%AC%8E%E3%80%8CRI%3APlace%E3%80%8D%E3%82%92%E3%82%AF%E3%83%AA%E3%82%A2%E3%81%97%E3%81%9F%EF%BC%81&openExternalBrowser=1">Xでシェア</a>    </div>
+  </section>
 
-    <div class="message" id="message" aria-live="polite"></div>
-  </div>
-
-  <div id="clearScreen" class="hidden">
-    <div class="clear-title">CLEAR</div>
-    <div class="clear-text">
-      おめでとうございます！<br>
-      すべての謎をクリアしました。
-    </div>
-  </div>
-
-</main>
+  <!-- 小謎の回答判定(常時表示) -->
+  <section id="small" class="small glass" hidden>
+    <h2>小謎の解答判定</h2>
+    <p class="small-note">※こちらは使用しなくても最後まで解くことは可能です</p>
+    <form id="smallForm" class="small-form" autocomplete="off">
+      <label for="smallAnswer">小謎の答え</label>
+      <input type="text" id="smallAnswer" lang="ja" placeholder="ひらがなで入力" required>
+      <button class="btn btn-main" type="submit">判定</button>
+    </form>
+    <p class="result" id="smallResult" role="status" aria-live="polite"></p>
+    <ul class="chips" id="chips" aria-label="判定済みの回答"></ul>
+  </section>
+</div>
 
 <script>
-  const steps = [
-    {
-      answer: "かいし",
-      label: "STEP 01",
-      description: "赤枠にパネルを当てはめ謎を成立させて、3つの答えを導いてください。"
-    },
-    {
-      answer: "あんど",
-      label: "STEP 02",
-      description: "新たに3つの謎と3つのパネルが追加されました。\nすべての謎が成立するように再配置-Re:place-を行ってください。"
-    },
-    {
-      answer: "あっと",
-      label: "LAST STEP",
-      description: "ここでは謎やパネルの追加は行われません。\n2ndで配置したパネルを置換-Replace-し、謎を解きなおしてください。\n置換のルール：「パネルのものを1つ次に置換する」"
-    }
-  ];
+/* ===== 設定:ここを書き換えれば内容を差し替えられます ===== */
+// 答えは平文ではなく、塩付きSHA-256のハッシュ値で持っています(ソースを見ても答えは読めません)
+const SALT = "ri-place:";
+const STEPS = [
+  {
+    hash: "62453d94e536893974ab1cfba2024cae6e6d4f4ce779ca06cc0edb1758159a3c",
+    label: "1st step", title: "Place -配置-",
+    text: "赤枠にパネルを当てはめて謎を成立させ、3つの答えを導いてください。",
+  },
+  {
+    hash: "322f744c7cc7c4019126b6e93354bbacf7b2179aa608c69402591f6b391a3b7e",
+    label: "2nd step", title: "Re:Place -再配置-",
+    text: "新たに3つの謎と3つのパネルが追加されました。\nすべての謎が成立するように再配置-Re:place-を行ってください。",
+  },
+  {
+    hash: "625c53e45baa1239aadbc17de830a3c51ac3c4e9d5230c0c51841bdd8e1cb546",
+    label: "Last step", title: "Replace -置換-",
+    text: "ここでは謎やパネルの追加は行われません。\n2ndで配置したパネルを置換-Replace-し、新たな6つの答えを導き出してください。\n置換のルール:「パネルのものを1つ次に置換する」",
+  },
+];
+const WAIT_AFTER_CORRECT = 1500;  // 「正解」を見せてから次が出るまで(ms)
+// 小謎の答えのハッシュ(ステップごと。現在のステップまでのものだけ判定される)
+const SMALL_BY_STEP = [
+  ["b8a512dcdba6bac21fdd25f67bdc3557e3750f275429aedf7d204cf39875b177","ce9ac8842b3c61841463feff8bb0b63ef37483d364e2ebef6f11355ce278ef2b","c8ab9f54d1a55decb39481ef27aa0438049d17f255349ef5400e9442a1d5d90c"],
+  ["6e2f8ffa505a6007ec8b6b8bdf4142f3e21c7202d99528d601a1893dd1ea56e5","a12d08f7791ea6ba67712a80a56084ac38c25465f007c5ee3bf8b28299645d50","8411b55fe597c36040df8dbe5a55a056417e3a4c654a48d38a4e6763b166b217","fdd244e808dfab7128ec1cc89340d2849f32ba96b84e31a48ba72b7fa80a09b1","06052d36b2645926a922b0406e55ecdd1aa61681bcb849953558542872bdb3c3","267e82296daead8c670fec24ee97099aaf22c806e0daac4375ba130216377f7a"],
+  ["e1cd6f03ee43eb63610898da52dc31873a8b6b7a563f96f630e4ee1ab6d33f54","f365904d5727070c226e3f560f2d03654dea99e4dabcc05517a43e680b06cf1d","42056aeef3083cd7687bd9039e107764fd7d8920a7ca17d9dad5eb8b3c485b76","44d1c11d3528fa8cb1db75abf748809179e8c94bc1aa29be967afe1fba61b911","6e86eb76b21dd1079606e9af9344d4ce880117f2b9cd65157566d074f3742708","ee461c07b3c2f574bc44b93e8d8a79aafbdf5994d27ca510b20849e5aeefe16c"],
+];
+/* ===== ここまで ===== */
 
-  let currentStep = 0;
+// 文字列 → 塩付きSHA-256(16進)
+async function sha(s){
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(SALT + s));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
+}
 
-  const game = document.getElementById("game");
-  const clearScreen = document.getElementById("clearScreen");
-  const form = document.getElementById("answerForm");
-  const answerInput = document.getElementById("answer");
-  const description = document.getElementById("description");
-  const stepLabel = document.getElementById("stepLabel");
-  const message = document.getElementById("message");
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+let current = 0;
+let busy = false;
+let started = false;
+let cleared = false;
+const found = new Set();
+const solved = [];   // 正解したステップの答え(表示用)
+const STORE_KEY = "ri-place-progress";
 
-  // 現在のステップを画面に反映
-  function renderStep() {
-    stepLabel.textContent = steps[currentStep].label;
-    description.textContent = steps[currentStep].description;
-    answerInput.value = "";
-    message.textContent = "";
-    message.className = "message";
+// 進行状況をこのブラウザに保存(開けない環境では保存せずそのまま遊べる)
+function save(){
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify({started, current, cleared, found:[...found], solved}));
+  }catch(e){}
+}
+
+// 入力ゆれの吸収:全角半角・カタカナ→ひらがな・空白除去
+function normalize(s){
+  return s.normalize("NFKC").replace(/\s+/g,"")
+    .replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60))
+    .toLowerCase();
+}
+
+function addNote(i, animate = true){
+  const s = STEPS[i];
+  const note = document.createElement("article");
+  note.className = "note glass" + (animate ? " fade-in" : "");
+  const h = document.createElement("h2");
+  const lb = document.createElement("span"); lb.className = "step-label"; lb.textContent = s.label;
+  h.append(lb, s.title);
+  const p = document.createElement("p"); p.textContent = s.text;
+  note.append(h,p);
+  $("log").appendChild(note);
+  return note;
+}
+
+// 解き終えたステップに答えを残す
+function addDone(note, text, animate = true){
+  const m = document.createElement("span");
+  m.className = "done" + (animate ? " fade-in" : "");
+  m.textContent = "✓ 正解:" + text;
+  note.appendChild(m);
+}
+
+function say(msg, cls){
+  const r = $("result");
+  r.textContent = msg; r.className = "result " + cls;
+  if(cls === "ng"){ void r.offsetWidth; r.classList.add("shake"); }
+}
+
+$("start").onclick = async () => {
+  $("cover").classList.remove("fade-in");
+  $("cover").classList.add("fade-out");
+  await sleep(1000);
+  $("cover").hidden = true;
+  $("game").hidden = false;
+  $("small").hidden = false;
+  window.scrollTo(0,0);
+  addNote(0);
+  $("form").classList.add("fade-in");
+  started = true; save();
+};
+
+$("form").onsubmit = async e => {
+  e.preventDefault();
+  if(busy) return;
+  const input = normalize($("answer").value);
+  if(!input) return;
+  busy = true;
+  if(await sha(input) !== STEPS[current].hash){ say("不正解","ng"); busy = false; return; }
+
+  $("answer").value = "";
+  $("answer").disabled = true; $("send").disabled = true;
+  say("正解","ok");
+  solved[current] = input;
+  addDone($("log").lastElementChild, input);
+  if(current === STEPS.length - 1){ cleared = true; } else { current++; }
+  save();                                    // 正解した時点で保存
+  await sleep(WAIT_AFTER_CORRECT);
+
+  if(cleared){                               // Last step 正解 → クリア
+    $("form").hidden = true; $("result").textContent = "";
+    $("clear").hidden = false; $("clear").classList.add("fade-in");
+    await sleep(200);
+    $("clear").scrollIntoView({behavior:"smooth", block:"center"});
+    return;
   }
+  $("result").textContent = "";
+  const note = addNote(current);
+  await sleep(300);
+  note.scrollIntoView({behavior:"smooth", block:"center"});
+  await sleep(900);
+  $("answer").disabled = false; $("send").disabled = false;
+  busy = false;
+  $("answer").focus({preventScroll:true});
+};
 
-  // ページを開くたびに最初の状態へ初期化
-  function initialize() {
-    currentStep = 0;
-    game.classList.remove("hidden");
-    clearScreen.classList.add("hidden");
-    form.reset();
-    renderStep();
-  }
-
-  form.addEventListener("submit", function(event) {
-    event.preventDefault();
-
-    const answer = answerInput.value.trim();
-
-    if (answer !== steps[currentStep].answer) {
-      message.textContent = "不正解";
-      message.className = "message wrong";
-      answerInput.select();
-      return;
-    }
-
-    // 最後の問題に正解した場合
-    if (currentStep === steps.length - 1) {
-      game.classList.add("hidden");
-      clearScreen.classList.remove("hidden");
-      return;
-    }
-
-    // 次のステップへ進む
-    message.textContent = "正解";
-    message.className = "message correct";
-
-    currentStep++;
-    renderStep();
+// 小謎の判定:正解した回答を五十音順に並べて残す
+function renderChips(newest){
+  const list = [...found].sort((a,b) => a.localeCompare(b, "ja"));
+  const ul = $("chips"); ul.innerHTML = "";
+  list.forEach(w => {
+    const li = document.createElement("li");
+    li.textContent = w;
+    if(w === newest) li.className = "new";
+    ul.appendChild(li);
   });
+}
+// 現在のステップまでの小謎の答えだけを有効にする
+const activeSmall = () => new Set(SMALL_BY_STEP.slice(0, current + 1).flat());
+$("smallForm").onsubmit = async e => {
+  e.preventDefault();
+  const w = normalize($("smallAnswer").value);
+  if(!w) return;
+  const r = $("smallResult");
+  $("smallAnswer").value = "";
+  if(!activeSmall().has(await sha(w))){ r.textContent = "不正解"; r.className = "result ng"; void r.offsetWidth; r.classList.add("shake"); return; }
+  if(found.has(w)){ r.textContent = "回答済みです"; r.className = "result ok"; return; }
+  found.add(w);
+  r.textContent = "正解"; r.className = "result ok";
+  renderChips(w);
+  save();
+};
 
-  // 初期表示
-  initialize();
+// 前回の続きから再開する
+(async function restore(){
+  let s = null;
+  try{ s = JSON.parse(localStorage.getItem(STORE_KEY)); }catch(e){}
+  if(!s || !s.started) return;
+  $("cover").hidden = true;          // 検証中に表紙が一瞬見えないよう先に隠す
+  current =Math.min(Math.max(parseInt(s.current, 10) || 0, 0), STEPS.length - 1);
+  cleared = !!s.cleared;
+  // 保存された答えが本当に正しいものかをハッシュで確かめてから復元する
+  const valid = new Set(SMALL_BY_STEP.flat());
+  for(const w of (Array.isArray(s.found) ? s.found : [])){
+    if(typeof w === "string" && valid.has(await sha(w))) found.add(w);
+  }
+  const saved = Array.isArray(s.solved) ? s.solved : [];
+  for(let i = 0; i < STEPS.length; i++){
+    if(typeof saved[i] === "string" && await sha(saved[i]) === STEPS[i].hash) solved[i] = saved[i];
+  }
+  started = true;
+
+  $("cover").hidden = true;
+  $("game").hidden = false;
+  $("small").hidden = false;
+  for(let i = 0; i <= current; i++){
+    const note = addNote(i, false);
+    if((i < current || cleared) && solved[i]) addDone(note, solved[i], false);
+  }
+  renderChips();
+  if(cleared){
+    $("form").hidden = true;
+    $("clear").hidden = false;
+  }
+})().catch(() => {                   // 復元に失敗したら表紙に戻す
+  $("cover").hidden = false; $("game").hidden = true; $("small").hidden = true;
+});
 </script>
 </body>
 </html>
-```
