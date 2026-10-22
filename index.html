@@ -92,12 +92,6 @@
     background: #355343;
   }
 
-  button:disabled,
-  input:disabled {
-    opacity: 0.6;
-    cursor: default;
-  }
-
   .message {
     min-height: 32px;
     margin-top: 20px;
@@ -114,7 +108,7 @@
   }
 
   .hidden {
-    display: none;
+    display: none !important;
   }
 
   .clear-title {
@@ -161,7 +155,7 @@
     <div class="step-label" id="stepLabel">STEP 01</div>
     <h1>まとめ謎</h1>
 
-    <div class="description" id="description">赤枠にパネルを当てはめ謎を成立させて、3つの答えを導いてください。</div>
+    <div class="description" id="description"></div>
 
     <form class="form" id="answerForm">
       <input
@@ -171,7 +165,7 @@
         autocomplete="off"
         required
       >
-      <button type="submit" id="submitButton">送信</button>
+      <button type="submit">送信</button>
     </form>
 
     <div class="message" id="message" aria-live="polite"></div>
@@ -208,42 +202,61 @@
 
   let currentStep = 0;
 
+  const game = document.getElementById("game");
+  const clearScreen = document.getElementById("clearScreen");
   const form = document.getElementById("answerForm");
   const answerInput = document.getElementById("answer");
   const description = document.getElementById("description");
   const stepLabel = document.getElementById("stepLabel");
   const message = document.getElementById("message");
 
+  // 現在のステップを画面に反映
+  function renderStep() {
+    stepLabel.textContent = steps[currentStep].label;
+    description.textContent = steps[currentStep].description;
+    answerInput.value = "";
+    message.textContent = "";
+    message.className = "message";
+  }
+
+  // ページを開くたびに最初の状態へ初期化
+  function initialize() {
+    currentStep = 0;
+    game.classList.remove("hidden");
+    clearScreen.classList.add("hidden");
+    form.reset();
+    renderStep();
+  }
+
   form.addEventListener("submit", function(event) {
     event.preventDefault();
 
     const answer = answerInput.value.trim();
-    const correctAnswer = steps[currentStep].answer;
 
-    if (answer !== correctAnswer) {
+    if (answer !== steps[currentStep].answer) {
       message.textContent = "不正解";
       message.className = "message wrong";
       answerInput.select();
       return;
     }
 
+    // 最後の問題に正解した場合
     if (currentStep === steps.length - 1) {
-      document.getElementById("game").classList.add("hidden");
-      document.getElementById("clearScreen").classList.remove("hidden");
+      game.classList.add("hidden");
+      clearScreen.classList.remove("hidden");
       return;
     }
 
+    // 次のステップへ進む
     message.textContent = "正解";
     message.className = "message correct";
 
     currentStep++;
-
-    stepLabel.textContent = steps[currentStep].label;
-    description.textContent = steps[currentStep].description;
-
-    answerInput.value = "";
-    answerInput.focus();
+    renderStep();
   });
+
+  // 初期表示
+  initialize();
 </script>
 </body>
 </html>
