@@ -71,6 +71,7 @@ button,input{font:inherit}
 .note{border-radius:30px;padding:34px 30px}
 .note h2{font-size:clamp(19px,1vw + 16px,26px);font-weight:900;margin-bottom:12px;letter-spacing:.06em;color:var(--fg)}
 .note h2::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--cyan);margin-right:10px;vertical-align:middle}
+.note p .em{font-weight:900;color:var(--fg);text-decoration:underline;text-underline-offset:.22em;text-decoration-thickness:2px}
 .step-label{display:block;font-size:.58em;font-weight:700;letter-spacing:.14em;color:var(--cyan);line-height:1.6;margin-bottom:2px}
 .note p{color:#40586a;white-space:pre-line;font-size:clamp(15px,.35vw + 14px,18px)}
 .note .done{display:block;margin-top:16px;font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.14em}
@@ -91,6 +92,7 @@ input[type=text]:focus{border-color:var(--cyan);outline:none;box-shadow:0 0 0 3p
 .clear h2{font-size:clamp(44px,14vw,80px);font-weight:900;letter-spacing:.14em;margin-left:.14em;
   background:linear-gradient(135deg,var(--cyan),var(--orange));-webkit-background-clip:text;background-clip:text;color:transparent}
 .clear p{color:var(--sub)}
+.clear .survey-note{margin-top:28px;font-size:14px}
 .share{display:inline-block;text-decoration:none;text-align:center;margin-top:8px}
 .ghost{background:var(--chip);border:0;border-radius:999px;color:var(--sub);padding:10px 26px;cursor:pointer;font-weight:700;transition:background .3s,color .3s}
 .ghost:hover{background:var(--cyan);color:#fff}
@@ -163,8 +165,11 @@ input[type=text]:focus{border-color:var(--cyan);outline:none;box-shadow:0 0 0 3p
     <p class="result" id="result" role="status" aria-live="polite"></p>
     <div class="clear" id="clear" hidden>
       <h2>CLEAR</h2>
-      <p>あなたは「RI:Place」を解き明かした。</p>
-      <a class="btn btn-sub share" target="_blank" rel="noopener noreferrer" href="https://twitter.com/intent/tweet?text=%E6%8C%81%E3%81%A1%E5%B8%B0%E3%82%8A%E8%AC%8E%E3%80%8CRI%3APlace%E3%80%8D%E3%82%92%E3%82%AF%E3%83%AA%E3%82%A2%E3%81%97%E3%81%9F%EF%BC%81&openExternalBrowser=1">Xでシェア</a>    </div>
+      <p>あなたは「RI:Place」をすべて解き明かした。</p>
+      <a class="btn btn-sub share" target="_blank" rel="noopener noreferrer" href="https://x.gd/286Sf">Xでシェア</a>
+      <p class="survey-note">よろしければアンケートへのご協力をお願いいたします。</p>
+      <a class="btn btn-main share" target="_blank" rel="noopener noreferrer" href="https://forms.gle/gpgbg6XyWg7wL9mYA">アンケートフォーム</a>
+    </div>
   </section>
 
   <!-- 小謎の回答判定(常時表示) -->
@@ -194,11 +199,12 @@ const STEPS = [
   {
     hash: "322f744c7cc7c4019126b6e93354bbacf7b2179aa608c69402591f6b391a3b7e",
     label: "2nd step", title: "Re:Place -再配置-",
-    text: "新たに3つの謎と3つのパネルが追加されました。\nすべての謎が成立するように再配置-Re:place-を行ってください。",
+    text: "封筒を開け、新たな3つの謎と3つのパネルを取り出してください。\nすべての謎が成立するように再配置-Re:place-を行ってください。",
   },
   {
     hash: "625c53e45baa1239aadbc17de830a3c51ac3c4e9d5230c0c51841bdd8e1cb546",
     label: "Last step", title: "Replace -置換-",
+    em: "1つ次",
     text: "ここでは謎やパネルの追加は行われません。\n2ndで配置したパネルを置換-Replace-し、新たな6つの答えを導き出してください。\n置換のルール:「パネルのものを1つ次に置換する」",
   },
 ];
@@ -248,7 +254,13 @@ function addNote(i, animate = true){
   const h = document.createElement("h2");
   const lb = document.createElement("span"); lb.className = "step-label"; lb.textContent = s.label;
   h.append(lb, s.title);
-  const p = document.createElement("p"); p.textContent = s.text;
+  const p = document.createElement("p");
+  const k = s.em ? s.text.indexOf(s.em) : -1;       // 強調したい語(太字+下線)
+  if(k < 0){ p.textContent = s.text; }
+  else{
+    const strong = document.createElement("strong"); strong.className = "em"; strong.textContent = s.em;
+    p.append(s.text.slice(0, k), strong, s.text.slice(k + s.em.length));
+  }
   note.append(h,p);
   $("log").appendChild(note);
   return note;
